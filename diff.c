@@ -37,6 +37,22 @@ void report_text_diff(char first_file_buffer[BUFFER_SIZE], char second_file_buff
     printf("\n%s", second_file_buffer);
 }
 
+void print_buf_by_hex(const char *buf, size_t n) {
+    for (int i = 0; i < n; ++i) {
+        printf("%2x ", buf[i]);
+    }
+    printf("\n");
+}
+
+void report_binary_diff(const char first_file_buffer[BUFFER_SIZE], const char second_file_buffer[BUFFER_SIZE], size_t n){
+    print_buf_by_hex(first_file_buffer, n);
+    for (int i = 0; i < n; i++) {
+        first_file_buffer[i] != second_file_buffer[i] ? printf("+ +") : printf("  ");
+    }
+    printf("\n");
+    print_buf_by_hex(second_file_buffer, n);
+}
+
 
 void clear_line_buffers(struct SmartBuf *first_sub_buf, struct SmartBuf *second_sub_buf) {
     first_sub_buf->length = 0;
@@ -72,7 +88,11 @@ void compare_files(struct T_file first, struct T_file second) {
                     offset = get_diff_offset(first_sub_buf->buf, second_sub_buf->buf, n);
                     if(offset > 0){
                         printf("\nDiscrepancy at byte %lu, at line %lu\n", bytes_count + offset, lines_count);
-                        report_text_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
+                        if(check_buf_is_printable(first_sub_buf->buf, first_sub_buf->length) && check_buf_is_printable(second_sub_buf->buf, second_sub_buf->length)){
+                            report_text_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
+                        }else{
+                            report_binary_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
+                        }
                     }
 
                     clear_line_buffers(first_sub_buf, second_sub_buf);
@@ -84,7 +104,11 @@ void compare_files(struct T_file first, struct T_file second) {
             offset = get_diff_offset(first_sub_buf->buf, second_sub_buf->buf, n);
             if(offset > 0){
                 printf("\nDiscrepancy at byte %lu, at line %lu\n", bytes_count + offset, lines_count);
-                report_text_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
+                if(check_buf_is_printable(first_sub_buf->buf, first_sub_buf->length) && check_buf_is_printable(second_sub_buf->buf, second_sub_buf->length)){
+                    report_text_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
+                }else{
+                    report_binary_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
+                }
             }
             break;
         }

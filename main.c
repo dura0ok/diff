@@ -8,8 +8,8 @@ void close_data(struct T_file first, struct T_file second){
 }
 
 int main() {
-    struct T_file first = open_file("in1.txt");
-    struct T_file second = open_file("in2.txt");
+    struct T_file first = open_file("kek1");
+    struct T_file second = open_file("kek2");
     long first_size = get_file_size(first);
     long second_size = get_file_size(second);
 
