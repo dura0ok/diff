@@ -39,7 +39,7 @@ void report_text_diff(char first_file_buffer[BUFFER_SIZE], char second_file_buff
 
 void print_buf_by_hex(const char *buf, size_t n) {
     for (int i = 0; i < n; ++i) {
-        printf("%02x ", buf[i]);
+        printf("%02x ", (unsigned char)buf[i]);
     }
     printf("\n");
 }
