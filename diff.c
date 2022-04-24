@@ -39,7 +39,7 @@ void report_text_diff(char first_file_buffer[BUFFER_SIZE], char second_file_buff
 
 void print_buf_by_hex(const char *buf, size_t n) {
     for (int i = 0; i < n; ++i) {
-        printf("%2x ", buf[i]);
+        printf("%02x ", buf[i]);
     }
     printf("\n");
 }
@@ -47,7 +47,7 @@ void print_buf_by_hex(const char *buf, size_t n) {
 void report_binary_diff(const char first_file_buffer[BUFFER_SIZE], const char second_file_buffer[BUFFER_SIZE], size_t n){
     print_buf_by_hex(first_file_buffer, n);
     for (int i = 0; i < n; i++) {
-        first_file_buffer[i] != second_file_buffer[i] ? printf("+ +") : printf("  ");
+        first_file_buffer[i] != second_file_buffer[i] ? printf("++") : printf("  ");
     }
     printf("\n");
     print_buf_by_hex(second_file_buffer, n);
@@ -85,7 +85,7 @@ void compare_files(struct T_file first, struct T_file second) {
                 bytes_count += 1;
                 if(first_file_buffer[i] == '\n' || second_file_buffer[i] == '\n'){
                     lines_count++;
-                    offset = get_diff_offset(first_sub_buf->buf, second_sub_buf->buf, n);
+                    offset = get_diff_offset(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
                     if(offset > 0){
                         printf("\nDiscrepancy at byte %lu, at line %lu\n", bytes_count + offset, lines_count);
                         if(check_buf_is_printable(first_sub_buf->buf, first_sub_buf->length) && check_buf_is_printable(second_sub_buf->buf, second_sub_buf->length)){
@@ -101,7 +101,7 @@ void compare_files(struct T_file first, struct T_file second) {
                 push_char_to_buffer(first_sub_buf, first_file_buffer[i]);
                 push_char_to_buffer(second_sub_buf, second_file_buffer[i]);
             }
-            offset = get_diff_offset(first_sub_buf->buf, second_sub_buf->buf, n);
+            offset = get_diff_offset(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
             if(offset > 0){
                 printf("\nDiscrepancy at byte %lu, at line %lu\n", bytes_count + offset, lines_count);
                 if(check_buf_is_printable(first_sub_buf->buf, first_sub_buf->length) && check_buf_is_printable(second_sub_buf->buf, second_sub_buf->length)){
