@@ -81,8 +81,6 @@ void compare_files(struct T_file first, struct T_file second) {
     struct SmartBuf* first_sub_buf = create_smart_buffer();
     struct SmartBuf* second_sub_buf = create_smart_buffer();
 
-    bool diff_found = false;
-    bool is_buff_printable;
     size_t lines_count = 1;
     size_t bytes_count = 0;
     int offset = 0;
