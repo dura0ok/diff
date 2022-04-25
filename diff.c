@@ -40,7 +40,6 @@ void report_text_diff(char first_file_buffer[BUFFER_SIZE], char second_file_buff
 void print_buf_by_hex(const char *buf, size_t n) {
     size_t byte_counter = 0;
     for (int i = 0; i < n; ++i) {
-        if(byte_counter == 16) printf(" | ");
         printf("%02x ", (unsigned char)buf[i]);
         byte_counter++;
     }
@@ -51,10 +50,7 @@ void report_binary_diff(const char first_file_buffer[BUFFER_SIZE], const char se
     printf("\nlog\n");
     print_buf_by_hex(first_file_buffer, n);
     for (int i = 0; i < n; i++) {
-        if(i == 20){
-            printf("   ");
-        }
-        first_file_buffer[i] != second_file_buffer[i] ? printf("++") : printf("   ");
+        first_file_buffer[i] != second_file_buffer[i] ? printf("++ ") : printf("   ");
     }
     printf("\n");
     print_buf_by_hex(second_file_buffer, n);
@@ -66,6 +62,17 @@ void clear_line_buffers(struct SmartBuf *first_sub_buf, struct SmartBuf *second_
     memset(&first_sub_buf->buf[0], 0, sizeof(first_sub_buf->buf[0]));
     second_sub_buf->length = 0;
     memset(&second_sub_buf->buf[0], 0, sizeof(second_sub_buf->buf[0]));
+}
+
+void handle_offset(struct SmartBuf *first_sub_buf, struct SmartBuf *second_sub_buf, size_t lines_count, size_t bytes_count,
+              int offset) {
+    if(offset <= 0) return;
+    printf("\nDiscrepancy at byte %lu, at line %lu\n", bytes_count + offset, lines_count);
+    if(check_buf_is_printable(first_sub_buf->buf, first_sub_buf->length) && check_buf_is_printable(second_sub_buf->buf, second_sub_buf->length)){
+        report_text_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
+    }else{
+        report_binary_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
+    }
 }
 
 void compare_files(struct T_file first, struct T_file second) {
@@ -92,14 +99,7 @@ void compare_files(struct T_file first, struct T_file second) {
                 if(first_file_buffer[i] == '\n' || second_file_buffer[i] == '\n'){
                     lines_count++;
                     offset = get_diff_offset(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
-                    if(offset > 0){
-                        printf("\nDiscrepancy at byte %lu, at line %lu\n", bytes_count + offset, lines_count);
-                        if(check_buf_is_printable(first_sub_buf->buf, first_sub_buf->length) && check_buf_is_printable(second_sub_buf->buf, second_sub_buf->length)){
-                            report_text_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
-                        }else{
-                            report_binary_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
-                        }
-                    }
+                    handle_offset(first_sub_buf, second_sub_buf, lines_count, bytes_count, offset);
 
                     clear_line_buffers(first_sub_buf, second_sub_buf);
                     continue;
@@ -108,14 +108,7 @@ void compare_files(struct T_file first, struct T_file second) {
                 push_char_to_buffer(second_sub_buf, second_file_buffer[i]);
             }
             offset = get_diff_offset(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
-            if(offset > 0){
-                printf("\nDiscrepancy at byte %lu, at line %lu\n", bytes_count + offset, lines_count);
-                if(check_buf_is_printable(first_sub_buf->buf, first_sub_buf->length) && check_buf_is_printable(second_sub_buf->buf, second_sub_buf->length)){
-                    report_text_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
-                }else{
-                    report_binary_diff(first_sub_buf->buf, second_sub_buf->buf, first_sub_buf->length);
-                }
-            }
+            handle_offset(first_sub_buf, second_sub_buf, lines_count, bytes_count, offset);
             break;
         }
     }
