@@ -38,16 +38,23 @@ void report_text_diff(char first_file_buffer[BUFFER_SIZE], char second_file_buff
 }
 
 void print_buf_by_hex(const char *buf, size_t n) {
+    size_t byte_counter = 0;
     for (int i = 0; i < n; ++i) {
+        if(byte_counter == 16) printf(" | ");
         printf("%02x ", (unsigned char)buf[i]);
+        byte_counter++;
     }
     printf("\n");
 }
 
 void report_binary_diff(const char first_file_buffer[BUFFER_SIZE], const char second_file_buffer[BUFFER_SIZE], size_t n){
+    printf("\nlog\n");
     print_buf_by_hex(first_file_buffer, n);
     for (int i = 0; i < n; i++) {
-        first_file_buffer[i] != second_file_buffer[i] ? printf("++") : printf("  ");
+        if(i == 20){
+            printf("   ");
+        }
+        first_file_buffer[i] != second_file_buffer[i] ? printf("++") : printf("   ");
     }
     printf("\n");
     print_buf_by_hex(second_file_buffer, n);
@@ -66,7 +73,6 @@ void compare_files(struct T_file first, struct T_file second) {
     char second_file_buffer[BUFFER_SIZE];
     struct SmartBuf* first_sub_buf = create_smart_buffer();
     struct SmartBuf* second_sub_buf = create_smart_buffer();
-
 
     bool diff_found = false;
     bool is_buff_printable;
