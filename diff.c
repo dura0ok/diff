@@ -17,8 +17,8 @@ bool check_buf_is_printable(char buf[BUFFER_SIZE], size_t n){
 }
 
 // return -1 if diff not found in char array
-int get_diff_offset(const char *first_file_buffer, const char *second_file_buffer, size_t n) {
-    int offset = 0;
+off_t get_diff_offset(const char *first_file_buffer, const char *second_file_buffer, size_t n) {
+    off_t offset = 0;
     for (int i = 0; i < n; i++) {
         offset++;
         if (first_file_buffer[i] != second_file_buffer[i]) {
@@ -40,6 +40,7 @@ void report_text_diff(char first_file_buffer[BUFFER_SIZE], char second_file_buff
 void print_buf_by_hex(const char *buf, size_t n) {
     size_t byte_counter = 0;
     for (int i = 0; i < n; ++i) {
+        if(i == 15) printf(" | ");
         printf("%02x ", (unsigned char)buf[i]);
         byte_counter++;
     }
@@ -47,9 +48,9 @@ void print_buf_by_hex(const char *buf, size_t n) {
 }
 
 void report_binary_diff(const char first_file_buffer[BUFFER_SIZE], const char second_file_buffer[BUFFER_SIZE], size_t n){
-    printf("\nlog\n");
     print_buf_by_hex(first_file_buffer, n);
     for (int i = 0; i < n; i++) {
+        if(i == 15) printf("   ");
         first_file_buffer[i] != second_file_buffer[i] ? printf("++ ") : printf("   ");
     }
     printf("\n");
@@ -65,7 +66,7 @@ void clear_line_buffers(struct SmartBuf *first_sub_buf, struct SmartBuf *second_
 }
 
 void handle_offset(struct SmartBuf *first_sub_buf, struct SmartBuf *second_sub_buf, size_t lines_count, size_t bytes_count,
-              int offset) {
+              off_t offset) {
     if(offset <= 0) return;
     printf("\nDiscrepancy at byte %lu, at line %lu\n", bytes_count + offset, lines_count);
     if(check_buf_is_printable(first_sub_buf->buf, first_sub_buf->length) && check_buf_is_printable(second_sub_buf->buf, second_sub_buf->length)){
@@ -83,7 +84,7 @@ void compare_files(struct T_file first, struct T_file second) {
 
     size_t lines_count = 1;
     size_t bytes_count = 0;
-    int offset = 0;
+    off_t offset;
 
     while (1) {
         size_t n = fread(first_file_buffer, 1, sizeof(first_file_buffer), first.file);
