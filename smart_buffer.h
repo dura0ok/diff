@@ -11,6 +11,7 @@ struct SmartBuf{
 struct SmartBuf* create_smart_buffer();
 void push_char_to_buffer(struct SmartBuf *smart_buf, char c);
 void push_char_array_to_buffer(struct SmartBuf *smart_buf, char *str);
+void print_smart_buffer(struct SmartBuf *smart_buf);
 void free_smart_buffer(struct SmartBuf *smart_buf);
 
 

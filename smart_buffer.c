@@ -39,6 +39,12 @@ void push_char_array_to_buffer(struct SmartBuf *smart_buf, char *str){
 
 }
 
+void print_smart_buffer(struct SmartBuf *smart_buf){
+    for (int i = 0; i < smart_buf->length; ++i) {
+        printf("%c", smart_buf->buf[i]);
+    }
+}
+
 void free_smart_buffer(struct SmartBuf *smart_buf){
     if(smart_buf == NULL) return;
     if(smart_buf->buf == NULL){
